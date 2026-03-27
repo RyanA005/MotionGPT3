@@ -1,6 +1,11 @@
 **/__pycache__/**
 *.pyc
 
+.env/
+env/
+deps/
+checkpoints/
+
 code_for_demo/
 demos/
 experiments/
