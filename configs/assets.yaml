@@ -25,7 +25,7 @@ METRIC:
     tmr_path: deps/tmr/tmr_humanml3d_guoh3dfeats/
 
 model:
-  whisper_path: deps/whisper-large-v2 # path for whisper model, webui only
+  whisper_path: deps/whisper-tiny # path for whisper model, webui only
   # whisper_path: openai/whisper-large-v2
 
 RENDER:

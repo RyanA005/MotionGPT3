@@ -1,5 +1,4 @@
 bert_score==0.3.13
-bpy==4.4.0
 einops==0.8.1
 hydra-core==1.3.2
 imageio==2.36.1
