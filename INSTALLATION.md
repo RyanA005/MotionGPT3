@@ -4,8 +4,8 @@
 
 ```bash
 py -3.10 -m venv .venv
-source .venv/bin/activate
-bash prepare/setup_all.sh
+source .venv/scripts/activate
+./prepare/setup_all.sh
 ```
 
 ## Inference
