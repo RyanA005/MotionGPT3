@@ -29,7 +29,7 @@ def render_batch(npy_dir, execute_python="./scripts/visualize_motion.sh", mode="
 def render(execute_python, npy_path, jointtype, cfg_path):
     # execute_python = "/apdcephfs/share_1227775/shingxchen/libs/blender_bpy/blender-2.93.2-linux-x64/blender"
     # execute_python = "/apdcephfs/share_1227775/mingzhenzhu/jiangbiao/libs/blender-2.93.2-linux-x64/blender"
-    export_scripts = "render.py"
+    export_scripts = "render.py"  # legacy; root render.py was removed from this fork
 
     os.system(
         f"{execute_python} --background --python {export_scripts} -- --cfg={cfg_path} --npy={npy_path}"

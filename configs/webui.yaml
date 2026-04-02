@@ -1,6 +1,6 @@
 NAME: Webui_MGPT3 # Experiment name
 DEBUG: False # Debug mode
-ACCELERATOR: 'gpu' # Devices optioncal: “cpu”, “gpu”, “tpu”, “ipu”, “hpu”, “mps, “auto”
+ACCELERATOR: 'cpu' # Devices optioncal: “cpu”, “gpu”, “tpu”, “ipu”, “hpu”, “mps, “auto”
 DEVICE: [0] # Index of gpus eg. [0] or [0,1,2,3]
 
 # Training configuration
@@ -39,7 +39,8 @@ DATASET:
   target: motGPT.data.webui.HumanML3DDataModule
 
 METRIC:
-  TYPE: ['TM2TMetrics']
+  # Empty list = inference-only: do not load T2M/MM evaluators (large deps under deps/t2m).
+  TYPE: []
 # Losses Configuration
 LOSS:
   # TYPE: t2mgpt # Losses type
@@ -78,6 +79,7 @@ model:
   params:
     condition: 'text'
     task: 't2m'
+    metrics_dict: []  # must match METRIC.TYPE (inference has no evaluators)
     lm: ${lm.mot_vae_gpt2}
     motion_vae: ${vae.mldvae}
     mot_factor: 1.0

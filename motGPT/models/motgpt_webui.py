@@ -7,11 +7,8 @@ from motGPT.config import instantiate_from_config
 from os.path import join as pjoin
 from motGPT.losses.motgpt import MotLosses
 from motGPT.models.base import BaseModel
-from .base import BaseModel
 import json
 # import motGPT.render.matplot.plot_3d_global as plot_3d
-from motGPT.utils.render_utils import render_motion
-
 
 
 def sig(x):

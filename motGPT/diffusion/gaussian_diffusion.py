@@ -505,8 +505,13 @@ class GaussianDiffusion:
         assert isinstance(shape, (tuple, list))
         if noise is not None:
             img = noise
+            dev = img.device
         else:
-            img = th.randn(*shape).cuda()
+            if device is not None:
+                dev = device if isinstance(device, th.device) else th.device(device)
+            else:
+                dev = th.device("cuda" if th.cuda.is_available() else "cpu")
+            img = th.randn(*shape, device=dev)
         indices = list(range(self.num_timesteps))[::-1]
 
         if progress:
@@ -516,7 +521,7 @@ class GaussianDiffusion:
             indices = tqdm(indices)
 
         for i in indices:
-            t = th.tensor([i] * shape[0]).cuda()
+            t = th.tensor([i] * shape[0], device=dev)
             with th.no_grad():
                 out = self.p_sample(
                     model,
@@ -672,8 +677,13 @@ class GaussianDiffusion:
         assert isinstance(shape, (tuple, list))
         if noise is not None:
             img = noise
+            dev = img.device
         else:
-            img = th.randn(*shape).cuda()
+            if device is not None:
+                dev = device if isinstance(device, th.device) else th.device(device)
+            else:
+                dev = th.device("cuda" if th.cuda.is_available() else "cpu")
+            img = th.randn(*shape, device=dev)
         indices = list(range(self.num_timesteps))[::-1]
 
         if progress:
@@ -683,7 +693,7 @@ class GaussianDiffusion:
             indices = tqdm(indices)
 
         for i in indices:
-            t = th.tensor([i] * shape[0]).cuda()
+            t = th.tensor([i] * shape[0], device=dev)
             with th.no_grad():
                 out = self.ddim_sample(
                     model,

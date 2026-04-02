@@ -9,6 +9,7 @@ from motGPT.data.build_data import build_data
 from motGPT.models.build_model import build_model
 from motGPT.utils.load_checkpoint import load_pretrained_vae
 from motGPT.utils.logger import create_logger
+from motGPT.utils.device import resolve_torch_device
 
 def main():
     # parse options
@@ -43,15 +44,15 @@ def main():
     assert cfg.TRAIN.PRETRAINED_VAE is not None
     load_pretrained_vae(cfg, model)
 
-    if cfg.ACCELERATOR == "gpu":
-        model = model.to('cuda')
+    device = resolve_torch_device(cfg.ACCELERATOR)
+    model = model.to(device)
 
     for batch in tqdm(datasets.train_dataloader(),
                       desc=f'motion tokenize'):
         name = batch['fname']
         
         pose = batch['motion']
-        pose = pose.cuda().float()
+        pose = pose.to(device).float()
 
         if pose.shape[1] == 0:
             continue

@@ -431,8 +431,8 @@ class MotionGPT(BaseModel):
 
                         # feat_ref = feats_ref[idx][:lengths[idx]]
                         # feat_rst = feats_rst[idx][:lengths[idx]]
-                        render_motion(joint_ref, None, output_dir=output_dir, fname=f'{keyid}_gt')
-                        render_motion(joint_rst, None, output_dir=output_dir, fname=f'{keyid}')
+                        render_motion(joint_ref, None, output_dir=output_dir, fname=f'{keyid}_gt', method='fast')
+                        render_motion(joint_rst, None, output_dir=output_dir, fname=f'{keyid}', method='fast')
                         np.savetxt(os.path.join(output_dir, f'{keyid}.txt'), [batch['text'][idx]], fmt='%s')
 
                 # MultiModality evaluation sperately

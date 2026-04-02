@@ -7,12 +7,10 @@ import numpy as np
 import moviepy.editor as mp
 from scipy.spatial.transform import Rotation as RRR
 import motGPT.render.matplot.plot_3d_global as plot_3d
-from motGPT.render.pyrender.hybrik_loc2rot import HybrIKJointsToRotmat
-from motGPT.render.pyrender.smpl_render import SMPLRender
 
 SMPL_MODEL_PATH = 'deps/smpl_models/smpl'
 
-def render_motion(data, feats, output_dir, fname=None, method='fast', smpl_model_path=SMPL_MODEL_PATH, fps=20):
+def render_motion(data, feats, output_dir, fname=None, method='slow', smpl_model_path=SMPL_MODEL_PATH, fps=20):
     if fname is None:
         fname = time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime(
             time.time())) + str(np.random.randint(10000, 99999))
@@ -23,6 +21,9 @@ def render_motion(data, feats, output_dir, fname=None, method='fast', smpl_model
     # np.save(output_npy_path, feats)
 
     if method == 'slow':
+        from motGPT.render.pyrender.hybrik_loc2rot import HybrIKJointsToRotmat
+        from motGPT.render.pyrender.smpl_render import SMPLRender
+
         if len(data.shape) == 4:
             data = data[0]
         data = data - data[0, 0]
