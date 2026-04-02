@@ -4,7 +4,7 @@
 
 ```bash
 py -3.10 -m venv .venv
-source .venv/scripts/activate
+source .venv/Scripts/activate
 ./prepare/setup_all.sh
 ```
 
