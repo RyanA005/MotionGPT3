@@ -3,7 +3,7 @@
 **Python 3.10+**, **Git**, **Git LFS**, and **bash** 
 
 ```bash
-pyt -3.10 -m venv .venv
+py -3.10 -m venv .venv
 source .venv/bin/activate
 bash prepare/setup_all.sh
 ```
