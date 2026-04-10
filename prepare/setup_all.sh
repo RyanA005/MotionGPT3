@@ -6,10 +6,12 @@ S="$REPO_ROOT/prepare/scripts"
 
 command -v python >/dev/null || { echo "python not found"; exit 1; }
 
-python -m pip install --upgrade pip
+python -m pip install --upgrade pip setuptools wheel
+pip install numpy==1.23.5
+pip install chumpy --no-build-isolation
 python -m pip install torch torchvision torchaudio \
   --index-url https://download.pytorch.org/whl/cu124
-python -m pip install -r requirements.txt
+python -m pip install -r requirements.txt --no-build-isolation
 
 bash "$S/download_smpl_model.sh"
 bash "$S/download_t2m_evaluators.sh"
