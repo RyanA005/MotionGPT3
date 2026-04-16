@@ -92,7 +92,13 @@ class MotGPT(BaseModel):
         if task in ['inbetween']:
             lengths = lengths_ref
         else:
-            lengths = [random.randint(15,25)*4 for l in lengths_ref]
+            lengths = []
+            for requested_len in lengths_ref:
+                # Respect explicit requested lengths from API/prompt path.
+                if requested_len is not None and int(requested_len) > 0:
+                    lengths.append(int(requested_len))
+                else:
+                    lengths.append(random.randint(15,25)*4)
         # feats_ref = batch['motion']
         motion_tokens_input = batch['motion_tokens_input']
 

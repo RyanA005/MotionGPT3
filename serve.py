@@ -1,5 +1,5 @@
 """
-MotionGPT3 HTTP API — also the server entrypoint:
+MotionGPT3 HTTP API - also the server entrypoint:
 
   python serve.py
 
@@ -9,6 +9,7 @@ MotionGPT3 HTTP API — also the server entrypoint:
 from __future__ import annotations
 
 import json
+import random
 import sys
 import time
 from contextlib import asynccontextmanager
@@ -56,10 +57,21 @@ def get_model():
     return _model
 
 
+def set_inference_seed(seed: int) -> None:
+    """Set deterministic seeds for one inference request."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+
 @torch.inference_mode()
 def generate_motion(
     prompt: str,
     motion_length: int = 0,
+    motion_seconds: float = 0.0,
+    seed: int | None = None,
     task: Literal["t2m", "t2t", "m2t"] = "t2m",
     include_feats: bool = False,
     motion_npy: str | None = None,
@@ -67,12 +79,17 @@ def generate_motion(
     """Run a single forward pass. For ``m2t``, pass ``motion_npy`` (HumanML 263-d features)."""
     if _model is None:
         raise RuntimeError("Model not loaded; call load_model_once() first.")
+    if seed is not None:
+        set_inference_seed(int(seed))
+    model = get_model()
+    fps = float(model.fps) if model is not None else 20.0
+    length_frames = int(round(motion_seconds * fps)) if motion_seconds > 0 else int(motion_length)
     lm = _model.lm
     fulfilled = lm.placeholder_fulfill(
-        prompt, motion_length, lm.input_motion_holder_seq, ""
+        prompt, length_frames, lm.input_motion_holder_seq, ""
     )
     batch: dict[str, Any] = {
-        "length": [motion_length],
+        "length": [length_frames],
         "text": [fulfilled],
         "motion_tokens_input": None,
         "feats_ref": None,
@@ -119,6 +136,8 @@ def generate_motion(
 def generate_artifacts(
     prompt: str,
     motion_length: int = 0,
+    motion_seconds: float = 0.0,
+    seed: int | None = None,
     task: Literal["t2m", "t2t", "m2t"] = "t2m",
     motion_npy: str | None = None,
     output_dir: str = "cache",
@@ -130,6 +149,8 @@ def generate_artifacts(
     out = generate_motion(
         prompt,
         motion_length=motion_length,
+        motion_seconds=motion_seconds,
+        seed=seed,
         task=task,
         include_feats=True,
         motion_npy=motion_npy,
@@ -171,6 +192,8 @@ def generate_artifacts(
 class GenerateBody(BaseModel):
     prompt: str = Field(..., min_length=1)
     motion_length: int = Field(0, ge=0)
+    motion_seconds: float = Field(0.0, ge=0.0)
+    seed: int | None = Field(None, ge=0)
     task: Literal["t2m", "t2t", "m2t"] = "t2m"
     include_feats: bool = False
     motion_npy: str | None = Field(
@@ -182,6 +205,8 @@ class GenerateBody(BaseModel):
 class GenerateArtifactsBody(BaseModel):
     prompt: str = Field(..., min_length=1)
     motion_length: int = Field(0, ge=0)
+    motion_seconds: float = Field(0.0, ge=0.0)
+    seed: int | None = Field(None, ge=0)
     task: Literal["t2m", "t2t", "m2t"] = "t2m"
     motion_npy: str | None = Field(
         None,
@@ -211,6 +236,8 @@ def post_generate(body: GenerateBody) -> dict[str, Any]:
     return generate_motion(
         body.prompt,
         motion_length=body.motion_length,
+        motion_seconds=body.motion_seconds,
+        seed=body.seed,
         task=body.task,
         include_feats=body.include_feats,
         motion_npy=body.motion_npy,
@@ -223,6 +250,8 @@ def post_generate_artifacts(body: GenerateArtifactsBody) -> dict[str, Any]:
     return generate_artifacts(
         body.prompt,
         motion_length=body.motion_length,
+        motion_seconds=body.motion_seconds,
+        seed=body.seed,
         task=body.task,
         motion_npy=body.motion_npy,
         output_dir=body.output_dir,
